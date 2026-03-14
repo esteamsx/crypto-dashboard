@@ -12,29 +12,38 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0b1120;color:white;tran
 .sidebar h2{color:#38bdf8;margin-top:15px;font-size:18px;}
 .news{background:rgba(30,41,59,0.85);padding:10px;border-radius:8px;margin-top:15px;max-height:300px;overflow-y:auto;}
 
-/* Circular Power Button */
-.power-circle {
-  margin-top:20px;
+/* Circular power button */
+.power-btn{
+  margin-top:15px;
   width:60px;
   height:60px;
-  background:#ef4444;
   border-radius:50%;
+  border:none;
+  background:#ef4444;
+  cursor:pointer;
+  position:relative;
+  transition:0.3s;
   display:flex;
   align-items:center;
   justify-content:center;
-  cursor:pointer;
-  box-shadow:0 0 15px #ef4444;
-  transition:all 0.3s;
 }
-.power-circle:hover {
-  background:#dc2626;
-  box-shadow:0 0 25px #ef4444;
+.power-btn::before{
+  content:"";
+  width:20px;
+  height:35px;
+  border-radius:4px;
+  background:white;
+  position:absolute;
+  top:12px;
 }
-.power-circle span {
-  font-size:28px;
-  color:white;
+.power-btn:hover{background:#dc2626;}
+#shutdownOverlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;background:#0b1120;
+  display:none;align-items:center;justify-content:center;flex-direction:column;
+  z-index:9999;color:#ef4444;font-size:24px;font-weight:bold;
 }
 
+/* Container */
 .container{flex:1;padding:20px;}
 header{display:flex;justify-content:space-between;align-items:center;padding:15px;background:#020617;box-shadow:0 0 25px rgba(0,0,0,0.8);}
 h1{font-size:22px;color:#38bdf8;}
@@ -79,10 +88,7 @@ tr:hover{background:#334155;cursor:pointer;}
   <div class="ticker" id="ticker"></div>
   <h2>Market Events</h2>
   <div class="news" id="news"></div>
-  <!-- Circular Power Button -->
-  <div class="power-circle" onclick="window.close()">
-    <span>⏻</span>
-  </div>
+  <button class="power-btn" id="powerBtn"></button>
 </div>
 
 <div class="container">
@@ -110,16 +116,17 @@ tr:hover{background:#334155;cursor:pointer;}
   </div>
 </div>
 
+<div id="shutdownOverlay">
+  <div>SHUTTING DOWN...</div>
+</div>
+
 <script>
 let chart, isDark=true, currentCoin=null;
-let allCoins=[];
-let defaultCoins=["bitcoin","ethereum","solana","ripple","cardano","dogecoin","tron","polkadot","litecoin"];
+const majorCoins=["bitcoin","ethereum","solana","tron","toncoin","dogecoin","ripple","litecoin","tether"];
+const coinSymbols={bitcoin:"BTC",ethereum:"ETH",solana:"SOL",tron:"TRX",toncoin:"TON",dogecoin:"DOGE",ripple:"XRP",litecoin:"LTC",tether:"USDT"};
 
 // Restore dark mode
-if(localStorage.getItem("darkMode")==="false"){
-  document.body.classList.add("light"); isDark=false;
-  document.getElementById("modeToggle").classList.add("sun");
-}
+if(localStorage.getItem("darkMode")==="false"){document.body.classList.add("light");isDark=false;document.getElementById("modeToggle").classList.add("sun");}
 
 // Load global stats
 async function loadGlobal(){
@@ -148,10 +155,10 @@ async function loadNews(){
   }catch(e){console.error(e);}
 }
 
-// Load cards, table, ticker
+// Load data
 async function loadData(){
   try{
-    const ids=currentCoin? [currentCoin]: defaultCoins;
+    const ids=currentCoin?[currentCoin]:majorCoins;
     const res=await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids.join(",")}`);
     const data=await res.json();
     const cards=document.getElementById("cards");
@@ -161,15 +168,28 @@ async function loadData(){
     data.forEach(c=>{
       let change=c.price_change_percentage_24h||0;
       let color=change>=0?"green":"red";
-      cards.innerHTML+=`<div class="card"><b>${c.symbol.toUpperCase()}</b><div class="price">$${c.current_price.toLocaleString()}</div><div class="${color}">${change.toFixed(2)}%</div></div>`;
-      table.innerHTML+=`<tr onclick="loadChart('${c.id}')"><td>${c.name}</td><td>$${c.current_price.toLocaleString()}</td><td class="${color}">${change.toFixed(2)}%</td><td>$${Math.round(c.market_cap/1e9)}B</td></tr>`;
-      ticker.innerHTML+=`<span>${c.symbol.toUpperCase()} $${c.current_price.toLocaleString()}</span>`;
+
+      // Cards
+      let cardDiv=document.createElement("div");
+      cardDiv.className="card";
+      cardDiv.innerHTML=`<b>${coinSymbols[c.id]}</b><div class="price">$${c.current_price.toLocaleString()}</div><div class="${color}">${change.toFixed(2)}%</div>`;
+      cardDiv.onclick=()=>{loadChart(c.id)};
+      cards.appendChild(cardDiv);
+
+      // Table
+      let tr=document.createElement("tr");
+      tr.innerHTML=`<td>${c.name}</td><td>$${c.current_price.toLocaleString()}</td><td class="${color}">${change.toFixed(2)}%</td><td>$${Math.round(c.market_cap/1e9)}B</td>`;
+      tr.onclick=()=>{loadChart(c.id)};
+      table.appendChild(tr);
+
+      // Ticker
+      ticker.innerHTML+=`<span>${coinSymbols[c.id]} $${c.current_price.toLocaleString()}</span>`;
     });
-    if(!currentCoin) loadChart(defaultCoins[0]);
+    if(!currentCoin) loadChart(majorCoins[0]);
   }catch(e){console.error(e);}
 }
 
-// Load coin chart
+// Load chart
 async function loadChart(id){
   currentCoin=id;
   try{
@@ -177,8 +197,8 @@ async function loadChart(id){
     const data=await res.json();
     let prices=data.prices.map(p=>p[1]);
     let labels=data.prices.map(p=>new Date(p[0]).toLocaleTimeString());
-    drawChart(labels, prices);
-    document.getElementById("chartTitle").innerText=id.toUpperCase()+" CHART";
+    drawChart(labels,prices);
+    document.getElementById("chartTitle").innerText=coinSymbols[id]+" CHART";
   }catch(e){console.error(e);}
 }
 
@@ -193,24 +213,18 @@ function drawChart(labels,prices){
   });
 }
 
-// Search (lazy-load allCoins)
+// Search limited to major coins
 const searchInput=document.getElementById("search");
 const dropdown=document.getElementById("dropdown");
-searchInput.addEventListener("input",async ()=>{
+searchInput.addEventListener("input",()=>{
   const val=searchInput.value.toLowerCase();
   dropdown.innerHTML="";
-  if(!val){dropdown.style.display="none"; return;}
-  if(allCoins.length===0){
-    const res=await fetch("https://api.coingecko.com/api/v3/coins/list");
-    allCoins=await res.json();
-  }
-  const matches=allCoins.filter(c=>c.name.toLowerCase().includes(val)||c.symbol.toLowerCase().includes(val)).slice(0,8);
+  if(!val){dropdown.style.display="none";return;}
+  let matches=majorCoins.filter(c=>c.includes(val)).slice(0,8);
   matches.forEach(c=>{
     let div=document.createElement("div");
-    div.innerText=`${c.name} (${c.symbol.toUpperCase()})`;
-    div.onclick=()=>{
-      dropdown.style.display="none"; searchInput.value=""; currentCoin=c.id; loadData(); loadChart(c.id);
-    };
+    div.innerText=coinSymbols[c]+" ("+c+")";
+    div.onclick=()=>{dropdown.style.display="none"; searchInput.value=""; currentCoin=c; loadData(); loadChart(c);}
     dropdown.appendChild(div);
   });
   dropdown.style.display=matches.length?"block":"none";
@@ -223,7 +237,12 @@ document.getElementById("modeToggle").addEventListener("click",()=>{
   localStorage.setItem("darkMode", isDark);
 });
 
-// Auto refresh every 5s
+// Power button
+document.getElementById("powerBtn").addEventListener("click",()=>{
+  document.getElementById("shutdownOverlay").style.display="flex";
+});
+
+// Auto refresh
 setInterval(()=>{loadData(); loadGlobal(); loadNews();},5000);
 
 // INIT
