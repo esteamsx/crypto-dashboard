@@ -3,84 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>𝗘𝗦 𝗧𝗘𝗔𝗠𝗦 𝗖𝗥𝗬𝗣𝗧𝗢 𝗖𝗢𝗡𝗧𝗥𝗢𝗟 𝗖𝗘𝗡𝗧𝗘𝗥</title>
+<title>𝗘𝗦 𝗧𝗘𝗔𝗠𝗦 𝗖𝗥𝗬𝗣𝗧𝗢 𝗖𝗘𝗡𝗧𝗘𝗥</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-/* ---------------- GENERAL ---------------- */
+
+/* GLOBAL RESET */
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#0b1120;color:white;transition:0.5s;display:flex;flex-direction:row;}
-a{text-decoration:none;color:inherit;}
-header{display:flex;justify-content:space-between;align-items:center;padding:15px;background:#020617;box-shadow:0 0 25px rgba(0,0,0,0.8);}
+body{font-family:'Segoe UI',Arial,sans-serif; background:#0b1120; color:white; transition:0.4s; display:flex; flex-direction:row;}
+
+/* HEADER */
+header{display:flex; justify-content:space-between; align-items:center; padding:15px; background:#020617; box-shadow:0 0 25px rgba(0,0,0,0.8);}
 h1{font-size:22px;color:#38bdf8;}
-.controls{display:flex;gap:10px;align-items:center;}
-.search{padding:8px;border-radius:6px;border:none;background:#1e293b;color:white;outline:none;width:180px;transition:0.3s;}
+.controls{position:relative; display:flex; gap:10px; align-items:center;}
+.search{padding:8px;border-radius:8px;border:none;background:#1e293b;color:white;width:200px;outline:none;transition:0.3s;}
 .search:focus{background:#334155;}
-.toggle-container{width:50px;height:28px;border-radius:50px;background:#2563eb;display:flex;align-items:center;cursor:pointer;padding:3px;transition:all 0.5s;}
+.dropdown{position:absolute; top:37px; left:0; width:200px; background:#1e293b; border-radius:8px; overflow:hidden; max-height:200px; overflow-y:auto; display:none; z-index:99;}
+.dropdown div{padding:8px; cursor:pointer; transition:0.2s;}
+.dropdown div:hover{background:#334155;}
+
+/* TOGGLE */
+.toggle-container{width:50px;height:28px;border-radius:50px;background:#2563eb;display:flex;align-items:center;cursor:pointer;padding:3px;transition:all .5s;}
 .toggle-container.sun{justify-content:flex-end;}
-.toggle-ball{width:22px;height:22px;border-radius:50%;background:yellow;transition:all 0.5s;}
-.ticker{background:#020617;padding:8px;overflow:hidden;white-space:nowrap;border-bottom:1px solid #1e293b;}
-.ticker span{padding-right:50px;display:inline-block;animation:scroll 20s linear infinite;}
+.toggle-ball{width:22px;height:22px;border-radius:50%;background:yellow;transition:all .5s;}
+
+/* TICKER */
+.ticker{background:#020617;padding:8px; overflow:hidden; white-space:nowrap; border-bottom:1px solid #1e293b;}
+.ticker span{padding-right:50px; display:inline-block; animation:scroll 20s linear infinite;}
 @keyframes scroll{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
+
+/* LAYOUT */
 .container{padding:20px;flex:1;}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:20px;}
-.stat{background:rgba(30,41,59,0.85);backdrop-filter:blur(10px);padding:15px;border-radius:12px;transition:0.3s;}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:20px;}
-.card{background:rgba(30,41,59,0.85);backdrop-filter:blur(10px);padding:15px;border-radius:12px;border:1px solid #334155;transition:0.3s;cursor:pointer;}
-.card:hover{transform:translateY(-5px);box-shadow:0 0 20px #38bdf8;}
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:15px; margin-bottom:20px;}
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:15px; margin-bottom:20px;}
+
+/* CARD EFFECT */
+.stat, .card{background:rgba(30,41,59,0.85); backdrop-filter:blur(10px); padding:15px; border-radius:12px; border:1px solid #334155; transition:0.3s; box-shadow:0px 4px 10px rgba(0,0,0,0.5);}
+.stat:hover, .card:hover{transform:translateY(-5px) scale(1.02); box-shadow:0px 6px 20px rgba(0,0,0,0.7);}
 .price{font-size:22px;margin-top:5px;}
+
 .green{color:#22c55e;}
 .red{color:#ef4444;}
+
+/* TABLE */
 table{width:100%;border-collapse:collapse;background:rgba(30,41,59,0.85);border-radius:8px;overflow:hidden;transition:0.3s;}
 th,td{padding:10px;border-bottom:1px solid #334155;text-align:left;}
-tr:hover{background:#334155;cursor:pointer;}
+tr:hover{background:#334155; cursor:pointer;}
+
+/* CHART */
 .chartbox{margin-top:25px;background:rgba(30,41,59,0.85);backdrop-filter:blur(10px);padding:20px;border-radius:12px;transition:0.3s;}
-.logs{background:black;color:#00ff9c;font-family:monospace;padding:10px;height:180px;overflow:auto;margin-top:20px;border-radius:8px;transition:0.3s;}
-.light .logs{color:#00ff9c;background:#e5e5e5;}
+
+/* NEWS */
+.news{background:rgba(30,41,59,0.85);padding:10px;border-radius:8px;margin-top:15px;max-height:300px;overflow-y:auto;}
+
+/* LIGHT MODE */
 .light{background:#f1f5f9;color:black;}
 .light header{background:white;}
 .light table,.light .card,.light .chartbox,.light .stat{background:white;color:black;}
 .light .search{background:#e5e5e5;color:black;}
 .light .toggle-ball{background:#333;}
 .light .ticker{background:#f1f5f9;color:black;}
-.light .card:hover{box-shadow:0 0 20px #2563eb;}
+.light .card:hover{box-shadow:0px 6px 20px rgba(0,0,0,0.3);}
 .light th, .light td{border-bottom:1px solid #ccc;}
-.coin-selector{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
-.coin-selector button{padding:6px 12px;border:none;border-radius:6px;background:#2563eb;color:white;cursor:pointer;transition:0.3s;}
-.coin-selector button:hover{background:#38bdf8;}
-.sidebar{width:220px;background:#020617;padding:10px;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
-.sidebar h2{color:#38bdf8;margin-bottom:10px;font-size:18px;}
-.sidebar button{margin-bottom:5px;padding:6px;border:none;border-radius:6px;background:#2563eb;color:white;cursor:pointer;transition:0.3s;}
-.sidebar button:hover{background:#38bdf8;}
-.news{background:rgba(30,41,59,0.85);padding:10px;border-radius:8px;margin-top:15px;max-height:300px;overflow-y:auto;}
-@media(max-width:900px){body{flex-direction:column;} .sidebar{width:100%;flex-direction:row;overflow-x:auto;} .sidebar button{flex-shrink:0;}}
+.light .news{background:#e5e5e5;color:black;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+body{flex-direction:column;}
+}
+
 </style>
 </head>
 <body>
 
 <div class="sidebar">
-<h2>Top Coins</h2>
-<div id="topCoins"></div>
-<h2>Crypto News</h2>
+<div class="ticker" id="ticker"></div>
+<h2 style="color:#38bdf8; margin-top:15px; font-size:18px;">Market Events</h2>
 <div class="news" id="news"></div>
 </div>
 
 <div class="container">
+
 <header>
-<h1>𝗘𝗦 𝗧𝗘𝗔𝗠𝗦 𝗖𝗥𝗬𝗣𝗧𝗢 𝗖𝗢𝗡𝗧𝗥𝗢𝗟 𝗖𝗘𝗡𝗧𝗘𝗥</h1>
+<h1>𝗘𝗦 𝗧𝗘𝗔𝗠𝗦 𝗖𝗥𝗬𝗣𝗧𝗢 𝗖𝗘𝗡𝗧𝗘𝗥</h1>
 <div class="controls">
 <input id="search" class="search" placeholder="Search coin">
+<div class="dropdown" id="dropdown"></div>
 <div class="toggle-container" id="modeToggle"><div class="toggle-ball"></div></div>
 </div>
 </header>
 
-<div class="ticker" id="ticker"></div>
 <div class="stats" id="stats"></div>
-<div class="coin-selector" id="coinSelector"></div>
 <div class="cards" id="cards"></div>
 
 <h3>Market Table</h3>
 <table>
-<thead><tr><th>Coin</th><th>Price</th><th>24h</th><th>Market Cap</th></tr></thead>
+<thead>
+<tr><th>Coin</th><th>Price</th><th>24h</th><th>Market Cap</th></tr>
+</thead>
 <tbody id="table"></tbody>
 </table>
 
@@ -89,148 +108,151 @@ tr:hover{background:#334155;cursor:pointer;}
 <canvas id="chart"></canvas>
 </div>
 
-<h3>Terminal Logs</h3>
-<div class="logs" id="logs"></div>
 </div>
 
 <script>
-let chart, logs=[], isDark=true;
-let coins=["bitcoin","ethereum","solana","ripple","toncoin","dogecoin","cardano","tron","polkadot","litecoin"];
-let alertSettings = {};
+let chart, isDark=true;
+let allCoins = [];
 
-// ---------------- GLOBAL STATS ----------------
+// 📈 Fetch list of all coins once for search dropdown
+async function loadAllCoins() {
+  const res = await fetch("https://api.coingecko.com/api/v3/coins/list");
+  allCoins = await res.json();
+}
+
+// 🔥 Global stats like total market cap, dominance
 async function loadGlobal(){
-try{
-const res=await fetch("https://api.coingecko.com/api/v3/global");
-const data=await res.json();
-document.getElementById("stats").innerHTML=`
-<div class="stat"><b>Total Market Cap</b><div>$${Math.round(data.data.total_market_cap.usd/1e9)}B</div></div>
-<div class="stat"><b>24h Volume</b><div>$${Math.round(data.data.total_volume.usd/1e9)}B</div></div>
-<div class="stat"><b>BTC Dominance</b><div>${data.data.market_cap_percentage.btc.toFixed(2)}%</div></div>`;
-}catch(e){console.error(e);}
+  try{
+    const res = await fetch("https://api.coingecko.com/api/v3/global");
+    const data = await res.json();
+    document.getElementById("stats").innerHTML = `
+      <div class="stat"><b>Total Market Cap</b><div>$${Math.round(data.data.total_market_cap.usd/1e9)}B</div></div>
+      <div class="stat"><b>24h Volume</b><div>$${Math.round(data.data.total_volume.usd/1e9)}B</div></div>
+      <div class="stat"><b>BTC Dominance</b><div>${data.data.market_cap_percentage.btc.toFixed(2)}%</div></div>
+    `;
+  }catch(e){console.error(e);}
 }
 
-// ---------------- COIN SELECTOR ----------------
-function createCoinSelector(){
-const selector=document.getElementById("coinSelector");
-coins.forEach(c=>{
-let btn=document.createElement("button");
-btn.innerText=c.toUpperCase();
-btn.onclick=()=>loadData(c);
-selector.appendChild(btn);
-});
-}
-
-// ---------------- TOP COINS SIDEBAR ----------------
-async function loadTopCoins(){
-try{
-const res=await fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1");
-const data=await res.json();
-const topDiv=document.getElementById("topCoins");
-topDiv.innerHTML="";
-data.forEach(c=>{
-let btn=document.createElement("button");
-btn.innerText=c.symbol.toUpperCase();
-btn.onclick=()=>loadData(c.id);
-topDiv.appendChild(btn);
-});
-}catch(e){console.error(e);}
-}
-
-// ---------------- LOAD NEWS ----------------
+// 📰 Live crypto news/events
 async function loadNews(){
-try{
-// Dummy news example (replace with real API if available)
-const newsDiv=document.getElementById("news");
-newsDiv.innerHTML="";
-const sampleNews=[
-"Bitcoin hits $30k",
-"Ethereum upgrades coming",
-"Altcoins surge in last 24h",
-"DeFi protocols update",
-"NFT marketplace trends"
-];
-sampleNews.forEach(n=>{
-let p=document.createElement("p");
-p.innerText=n;
-newsDiv.appendChild(p);
-});
-}catch(e){console.error(e);}
+  try{
+    const res = await fetch("https://cryptocurrency.cv/api/news");
+    const newsData = await res.json();
+    const newsDiv = document.getElementById("news");
+    newsDiv.innerHTML = "";
+    newsData.slice(0,10).forEach(item=>{
+      let p = document.createElement("p");
+      p.innerHTML = `<a href="${item.url}" target="_blank">${item.title} <span style="opacity:.7;font-size:12px;">(${item.source})</span></a>`;
+      newsDiv.appendChild(p);
+    });
+  }catch(e){
+    console.error("Error fetching news", e);
+  }
 }
 
-// ---------------- LOAD DATA ----------------
+// 💹 Load market data
 async function loadData(search){
-try{
-let filteredCoins = coins;
-if(search) filteredCoins = [search.toLowerCase()];
-const res=await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${filteredCoins.join(",")}`);
-const data=await res.json();
-const cards=document.getElementById("cards");
-const table=document.getElementById("table");
-const ticker=document.getElementById("ticker");
-cards.innerHTML=""; table.innerHTML=""; ticker.innerHTML="";
-let prices=[], labels=[];
-data.forEach(c=>{
-let change=c.price_change_percentage_24h; 
-let color=change>=0?"green":"red";
-cards.innerHTML+=`<div class="card"><b>${c.symbol.toUpperCase()}</b><div class="price">$${c.current_price.toLocaleString()}</div><div class="${color}">${change.toFixed(2)}%</div></div>`;
-table.innerHTML+=`<tr onclick="loadChart('${c.id}')"><td>${c.name}</td><td>$${c.current_price.toLocaleString()}</td><td class="${color}">${change.toFixed(2)}%</td><td>$${Math.round(c.market_cap/1e9)}B</td></tr>`;
-ticker.innerHTML+=`<span>${c.symbol.toUpperCase()} $${c.current_price.toLocaleString()}</span>`;
-prices.push(c.current_price); labels.push(c.symbol.toUpperCase());
-logs.unshift(`[${new Date().toLocaleTimeString()}] ${c.symbol.toUpperCase()} updated`);
-if(logs.length>50) logs.pop();
-if(alertSettings[c.id]){
-if(alertSettings[c.id].above && c.current_price>alertSettings[c.id].above){alert(`${c.symbol.toUpperCase()} ABOVE ${alertSettings[c.id].above}`);}
-if(alertSettings[c.id].below && c.current_price<alertSettings[c.id].below){alert(`${c.symbol.toUpperCase()} BELOW ${alertSettings[c.id].below}`);}
-}
-});
-document.getElementById("logs").innerHTML=logs.join("<br>");
-drawChart(labels,prices);
-}catch(e){console.error(e);}
+  try{
+    let ids = search ? [search] : allCoins.slice(0,10).map(c=>c.id);
+    const res = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids.join(",")}`);
+    const data = await res.json();
+    const cards = document.getElementById("cards");
+    const table = document.getElementById("table");
+    cards.innerHTML=""; table.innerHTML="";
+    let prices = [], labels=[];
+    data.forEach(c=>{
+      let change = c.price_change_percentage_24h;
+      let color = change>=0?"green":"red";
+      cards.innerHTML+=`
+        <div class="card">
+          <b>${c.symbol.toUpperCase()}</b>
+          <div class="price">$${c.current_price.toLocaleString()}</div>
+          <div class="${color}">${change.toFixed(2)}%</div>
+        </div>`;
+      table.innerHTML+=`
+        <tr onclick="loadChart('${c.id}')">
+          <td>${c.name}</td>
+          <td>$${c.current_price.toLocaleString()}</td>
+          <td class="${color}">${change.toFixed(2)}%</td>
+          <td>$${Math.round(c.market_cap/1e9)}B</td>
+        </tr>`;
+      prices.push(c.current_price);
+      labels.push(c.symbol.toUpperCase());
+    });
+    drawChart(labels, prices);
+  }catch(e){console.error(e);}
 }
 
-// ---------------- LOAD CHART ----------------
+// 📊 Load a coin chart
 async function loadChart(id){
-try{
-const res=await fetch(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=1`);
-const data=await res.json();
-let prices=data.prices.map(p=>p[1]);
-let labels=data.prices.map(p=>new Date(p[0]).toLocaleTimeString());
-drawChart(labels,prices);
-document.getElementById("chartTitle").innerText=id.toUpperCase()+" CHART";
-}catch(e){console.error(e);}
+  try{
+    const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=1`);
+    const data = await res.json();
+    let prices = data.prices.map(p=>p[1]);
+    let labels = data.prices.map(p=>new Date(p[0]).toLocaleTimeString());
+    drawChart(labels,prices);
+    document.getElementById("chartTitle").innerText = id.toUpperCase()+" CHART";
+  }catch(e){console.error(e);}
 }
 
-// ---------------- DRAW CHART ----------------
+// 📈 Render the chart
 function drawChart(labels,prices){
-const ctx=document.getElementById("chart");
-if(chart) chart.destroy();
-chart=new Chart(ctx,{
-type:'line',
-data:{labels, datasets:[{data:prices,borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,0.2)',tension:0.3}]},
-options:{plugins:{legend:{display:true}},scales:{y:{ticks:{color:isDark?"white":"black"}},x:{ticks:{color:isDark?"white":"black"}}}}
-});
+  const ctx = document.getElementById("chart");
+  if(chart) chart.destroy();
+  chart = new Chart(ctx,{
+    type:'line',
+    data:{labels, datasets:[{data:prices,borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,0.2)',tension:.3}]},
+    options:{
+      plugins:{legend:{display:true}},
+      scales:{y:{ticks:{color:isDark?"white":"black"}},x:{ticks:{color:isDark?"white":"black"}}}
+    }
+  });
 }
 
-// ---------------- EVENTS ----------------
-document.getElementById("search").addEventListener("keypress",function(e){
-if(e.key==="Enter"){loadData(this.value);}
+// ✨ Search dropdown logic
+const searchInput = document.getElementById("search");
+const dropdown = document.getElementById("dropdown");
+searchInput.addEventListener("input",()=>{
+  const val = searchInput.value.toLowerCase();
+  dropdown.innerHTML="";
+  if(!val){dropdown.style.display="none";return;}
+  let matches = allCoins.filter(c=>
+    c.name.toLowerCase().includes(val) ||
+    c.symbol.toLowerCase().includes(val)
+  ).slice(0,8);
+  matches.forEach(c=>{
+    let div = document.createElement("div");
+    div.innerText = `${c.name} (${c.symbol.toUpperCase()})`;
+    div.onclick = ()=>{
+      dropdown.style.display="none";
+      searchInput.value="";
+      loadData(c.id);
+    };
+    dropdown.appendChild(div);
+  });
+  dropdown.style.display = matches.length?"block":"none";
 });
+
+// 🌙 Dark/Light switch
 document.getElementById("modeToggle").addEventListener("click",()=>{
-document.body.classList.toggle("light");
-isDark=!isDark;
-document.getElementById("modeToggle").classList.toggle("sun");
+  document.body.classList.toggle("light");
+  isDark = !isDark;
+  document.getElementById("modeToggle").classList.toggle("sun");
 });
 
-// ---------------- AUTO UPDATE ----------------
-setInterval(()=>loadData(),5000);
+// ⏱ Auto refresh everything
+setInterval(()=>{
+  loadData();
+  loadGlobal();
+  loadNews();
+},5000);
 
-// ---------------- INIT ----------------
-loadGlobal();
-createCoinSelector();
-loadTopCoins();
-loadNews();
-loadData();
+// 🚀 INIT
+loadAllCoins().then(()=>{
+  loadGlobal(); loadNews(); loadData();
+});
+
 </script>
+
 </body>
 </html>
